@@ -14,7 +14,7 @@ class NetworkApiService extends BaseAPIService{
   Future getApiResponse(String url) async{
     dynamic jsonResponse;
     try{
-      http.Response response = await http.get(Uri.parse(url)).timeout(Duration(seconds: 10));
+      http.Response response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
       jsonResponse = returnResponse(response);
     } on SocketException{
       throw FetchDataExceptions('No internet connection');

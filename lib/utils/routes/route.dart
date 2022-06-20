@@ -8,6 +8,7 @@ class Routes {
 
   /// Route is data type
   static Route<dynamic> generateRoute(RouteSettings settings){
+
     switch(settings.name){
       case RouteName.home:
         return MaterialPageRoute(builder: (BuildContext context) => HomeScreen());
