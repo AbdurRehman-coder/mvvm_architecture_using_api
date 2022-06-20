@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:untitled/resources/components/round_button.dart';
 import 'package:untitled/utils/general_utils.dart';
 
 
@@ -55,8 +56,6 @@ class _LoginScreenState extends State<LoginScreen> {
             },
           ),
 
-          SizedBox(height: 16,),
-
           ValueListenableBuilder(
               valueListenable: _isVisible,
               builder: (context, value, child){
@@ -82,20 +81,32 @@ class _LoginScreenState extends State<LoginScreen> {
                 );
               },
           ),
-          SizedBox(height: 16,),
-          ValueListenableBuilder(
-              valueListenable: _counter,
-              builder: (context, value, child){
-                return Text(_counter.value.toString(), style: Theme.of(context).textTheme.titleMedium,);
-              },),
+          const SizedBox(height: 26,),
+
+          RoundButton(
+            title: 'Login',
+            onPress: (){
+              if(_emailTextController.text.isEmpty){
+                Utils.flutterToastMessage('Email is required');
+                Utils.flushBarErrorWidget(context, 'Email is empty');
+              } else if(_emailTextController.text.contains('@')){
+                Utils.flushBarErrorWidget(context, 'Yes contained: \'@\'');
+              } else if (_passwordTextController.text.isEmpty){
+                Utils.snackBarWidget(context, 'Password is required');
+              } else if(_passwordTextController.text.length < 6){
+                Utils.flushBarErrorWidget(context, 'password length must be greater the 6');
+              } else{
+                print('API call');
+              }
+            },
+
+
+          ),
+
 
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _counter.value++;
-        },
-      ),
+
     );
   }
 }

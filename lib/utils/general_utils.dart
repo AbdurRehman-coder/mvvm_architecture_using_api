@@ -19,7 +19,6 @@ class Utils{
           flushbar: Flushbar(
             message: message,
             // backgroundColor: Colors.amberAccent,
-            title: "Testing",
             forwardAnimationCurve: Curves.elasticInOut,
             reverseAnimationCurve: Curves.elasticInOut,
             duration: const Duration(seconds: 2),
