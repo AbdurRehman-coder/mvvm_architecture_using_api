@@ -1,7 +1,10 @@
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:untitled/resources/components/round_button.dart';
 import 'package:untitled/utils/general_utils.dart';
+import 'package:untitled/view_model/auth_view_model.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -31,80 +34,90 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authViewModel = Provider.of<AuthViewModel>(context);
   print('build called...');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login'),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          TextFormField(
-            controller: _emailTextController,
-            focusNode: _emailFocusNode,
-            decoration: const InputDecoration(
-              hintText: 'Enter email',
-              label: Text('Email'),
-              prefixIcon: Icon(Icons.alternate_email_rounded),
-            ),
-            onFieldSubmitted: (value){
-              FocusScope.of(context).requestFocus(_passwordFocusNode);
-            },
-            onEditingComplete: (){
-              print('Editing completed: ${_emailTextController}');
-            },
-          ),
-
-          ValueListenableBuilder(
-              valueListenable: _isVisible,
-              builder: (context, value, child){
-                return  TextFormField(
-                  controller: _passwordTextController,
-                  focusNode: _passwordFocusNode,
-                  obscureText: _isVisible.value,
-                  obscuringCharacter: '*',
-                  decoration:  InputDecoration(
-                    hintText: 'Enter password',
-                    label: Text('Password'),
-                    prefixIcon: Icon(Icons.lock_clock_outlined),
-                    suffix: GestureDetector(
-                        onTap: (){
-                            _isVisible.value = !_isVisible.value;
-
-                        },
-                        child: Icon(_isVisible.value? Icons.visibility_off : Icons.visibility)),
-                  ),
-                  onFieldSubmitted: (value){
-                    Utils.flutterToastMessage('done: $value');
-                  },
-                );
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            TextFormField(
+              controller: _emailTextController,
+              focusNode: _emailFocusNode,
+              decoration: const InputDecoration(
+                hintText: 'Enter email',
+                label: Text('Email'),
+                prefixIcon: Icon(Icons.alternate_email_rounded),
+              ),
+              onFieldSubmitted: (value){
+                FocusScope.of(context).requestFocus(_passwordFocusNode);
               },
-          ),
-          const SizedBox(height: 26,),
+              onEditingComplete: (){
+                print('Editing completed: ${_emailTextController}');
+              },
+            ),
 
-          RoundButton(
-            title: 'Login',
-            onPress: (){
-              if(_emailTextController.text.isEmpty){
-                Utils.flutterToastMessage('Email is required');
-                Utils.flushBarErrorWidget(context, 'Email is empty');
-              } else if(_emailTextController.text.contains('@')){
-                Utils.flushBarErrorWidget(context, 'Yes contained: \'@\'');
-              } else if (_passwordTextController.text.isEmpty){
-                Utils.snackBarWidget(context, 'Password is required');
-              } else if(_passwordTextController.text.length < 6){
-                Utils.flushBarErrorWidget(context, 'password length must be greater the 6');
-              } else{
-                print('API call');
-              }
-            },
+            ValueListenableBuilder<bool>(
+                valueListenable: _isVisible,
+                builder: (context, snap, child){
+                  return  TextFormField(
+                    controller: _passwordTextController,
+                    focusNode: _passwordFocusNode,
+                    obscureText: snap,
+                    obscuringCharacter: '*',
+                    decoration:  InputDecoration(
+                      hintText: 'Enter password',
+                      label: Text('Password'),
+                      prefixIcon: Icon(Icons.lock_clock_outlined),
+                      suffix: GestureDetector(
+                          onTap: (){
+                              _isVisible.value = !_isVisible.value;
+                            // snap = !snap;
+
+                          },
+                          child: Icon( snap ? Icons.visibility_off : Icons.visibility)),
+                    ),
+                    onFieldSubmitted: (value){
+                      Utils.flutterToastMessage('done: $value');
+                    },
+                  );
+                },
+            ),
+            const SizedBox(height: 26,),
+
+            RoundButton(
+              title: 'Login',
+              isLoading: authViewModel.isLoading,
+              onPress: (){
+                /// Encode email and password into Map body
+                Map body = {
+                  'email' : _emailTextController.text,
+                  'password' : _passwordTextController.text,
+                };
+                if(_emailTextController.text.isEmpty){
+                  Utils.flutterToastMessage('Email is required');
+                  Utils.flushBarErrorWidget(context, 'Email is empty');
+                }  else if (_passwordTextController.text.isEmpty){
+                  Utils.snackBarWidget(context, 'Password is required');
+                } else if(_passwordTextController.text.length < 6){
+                  Utils.flushBarErrorWidget(context, 'password length must be greater the 6');
+                } else{
+                  print('API call');
+                  authViewModel.postApiService(body, context);
+                }
+              },
 
 
-          ),
+            ),
 
 
-        ],
+          ],
+        ),
       ),
 
     );

@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:untitled/data/app_exceptions.dart';
 import 'package:untitled/data/network/base_api_service.dart';
 import 'package:http/http.dart' as http;
@@ -16,6 +17,10 @@ class NetworkApiService extends BaseAPIService{
     try{
       http.Response response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
       jsonResponse = returnResponse(response);
+      if(kDebugMode){
+        // print(jsonResponse);
+      }
+      return jsonResponse;
     } on SocketException{
       throw FetchDataExceptions('No internet connection');
     }
@@ -35,7 +40,8 @@ class NetworkApiService extends BaseAPIService{
     ///  the response on successful request from the server
     jsonResponse = returnResponse(postResponse);
 
-
+      print('post response: ${jsonResponse}');
+    return jsonResponse;
   }
 
   dynamic returnResponse(http.Response response){
